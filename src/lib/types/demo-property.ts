@@ -4,7 +4,7 @@ export type DemoProperty = {
   image: string
   city: string
   pricePerNight: number
-  hostname: string
+  hostName: string
   rating: number
   maxGuests: number
   availableDates: string[]
