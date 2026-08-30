@@ -1,19 +1,20 @@
 import { authOptions } from '@/auth/config';
-import {getServerSession} from 'next-auth'
+import { getServerSession } from 'next-auth'
 
 import { redirect } from 'next/navigation';
 
 export async function getCurrentUser() {
-  let session;
-
   try {
-    session = await getServerSession(authOptions)
+    const session = await getServerSession(authOptions)
+    return session 
   } catch (error) {
-    return null   
+    return null
   }
+}
 
-  if (!session) redirect('/login') 
-
+export async function requireUser() {
+  const session = await getCurrentUser()
+  if (!session) redirect('/login')
   return session
 }
 

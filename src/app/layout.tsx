@@ -3,6 +3,7 @@ import "./globals.css";
 import { Toaster } from "react-hot-toast";
 import { Suspense } from "react";
 import { Loader2 } from "lucide-react";
+import {Navbar} from "@/components/navbar"
 
 
 export const metadata: Metadata = {
@@ -16,8 +17,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       lang="en"
       className={`full antialiased`}
     >
-      <body className="min-h-full flex flex-col">
+      <body className="min-h-screen flex flex-col">
         <Toaster position="top-center" reverseOrder={false} />
+        <Navbar/>
         <Suspense fallback={
           <div className="flex min-h-[88vh] items-center justify-center">
             <Loader2 className="size-5 animate-spin" />
