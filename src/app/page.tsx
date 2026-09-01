@@ -1,7 +1,8 @@
 import { fetchDemoProperties } from "@/seed/demo/demo-properties";
-import { ChevronRight, Flame, HomeIcon, Landmark, Mountain, Palmtree, Snowflake, Star, TreePalm, Waves } from "lucide-react";
+import { ChevronRight, Flame, HomeIcon, Landmark, Mountain, Palmtree, Snowflake, Star, TreePalm, Users, Waves } from "lucide-react";
 import Link from "next/link";
 import { SafeImage } from "@/components/safe-image"
+import { HomeSearchbar } from "@/components/home-searchbar";
 
 
 type HomePageProps = {
@@ -101,7 +102,7 @@ export default async function Home({ searchParams }: HomePageProps) {
         </div>
 
         <div className="mx-auto mt-7 max-w-230 md:mt-8">
-          {/* <HomeSearchBar */}
+          <HomeSearchbar/>
         </div>
 
         <div className="mx-auto mt-6 flex max-w-230 items-start justify-between gap-3">
@@ -179,6 +180,44 @@ export default async function Home({ searchParams }: HomePageProps) {
 
         </div>
       </section>
+
+      <footer className="mt-16 rounded-3xl border border-ink-200 bg-surface p-6 shadow-sm md:mt-14 md:p-7">
+        <div className="grid gap-8 md:grid-cols-4">
+          <div className="md:col-span-2">
+            <h3 className="text-2xl font-semibold text-ink-900">StayScape</h3>
+            <p className="mt-3 max-w-xl text-sm text-ink-600">
+              Discover carefully curated US stays with booking flow designed for clairty and confidence. Compare homes quickly and reserver with ease.
+            </p>
+            <p className="mt-5 inline-flex items-center gap-1 text-xs text-ink-500">
+              <Users className="siz-3.5"/>
+              Powered by curated sample listing data focused on US destinations.
+            </p>
+          </div>
+
+          <div>
+            <h4 className="text-sm font-semibold text-ink-900">Explore</h4>
+            <ul className="mt-3 space-y-2 text-sm text-ink-600">
+              <li>City gateways</li>
+              <li>Coastal retreats</li>
+              <li>Cabin weekends</li>
+              <li>Extended stays</li>
+            </ul>
+          </div>
+          <div>
+            <h4 className="text-sm font-semibold text-ink-900">Support</h4>
+            <ul className="mt-3 space-y-2 text-sm text-ink-600">
+              <li>Guest help center</li>
+              <li>Host guidelines</li>
+              <li>Cancellation policy</li>
+              <li>Trust and safety</li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="mt-8 border-ink-200 pt-4 text-xs text-ink-500">
+          &copy; {new Date().getFullYear()} staysCape. All rights reserved.
+        </div>
+      </footer>
     </main>
   );
 }
