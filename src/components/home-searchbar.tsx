@@ -7,6 +7,7 @@ import { act, useEffect, useMemo, useRef, useState } from "react";
 import type { DateRange } from "react-day-picker";
 import { useFormStatus } from "react-dom";
 import { DateRangePicker } from "./date-range-picker";
+import { MAX_INFANTS } from "@/lib/booking-rules";
 
 
 type HomerSearchbarProps = {
@@ -55,22 +56,22 @@ export function HomeSearchbar({
   const totalGuests = adults + children + infants
   const whenLabel = useMemo(() => {
     if (!range?.from && !range?.to) return "Add Dates"
-    if (range?.from && range?.to) return `${format(range.from, 'MM d')} - Add`
+    if (range?.from && !range?.to) return `${format(range.from, 'MMM d')} - Add`
     if (range?.from && range?.to) {
-      return `${format(range.from, 'MM d')} - ${format(range.to, 'MM d')}`
+      return `${format(range.from, 'MMM d')} - ${format(range.to, 'MMM d')}`
     }
 
     return 'Add dates'
-  }, [])
+  }, [range])
 
-  useEffect(()=>{
+  useEffect(() => {
     const mediaQuery = window.matchMedia('(min-width: 760px');
     const syncViewPort = () => setIsDesktopViewPort(mediaQuery.matches);
     syncViewPort()
     mediaQuery.addEventListener('change', syncViewPort);
 
     return () => mediaQuery.removeEventListener('change', syncViewPort)
-  },[])
+  }, [])
 
   return (
     <div className="relative rounded-4xl bg-surface p-2.5 shadow-sm md:border md:border-ink-200 md:p-4">
@@ -191,9 +192,56 @@ export function HomeSearchbar({
 
       {
         activePanel === 'when' && (
-          <div className="fixed inset-0 z-20 flex items-center justify-center p-4 md:absolute md:inset-auto md:left-1/2 md:top-22 md:block md:w-[min - (960px, calc(100vw - 2rem))] md:-translate-x-1/2" onClick={()=>setActivePanel(null)}>
-            <div className="w-full max-w-md max-h-[calc(100dvh-2rem)] overflow-auto rounded-[28px] border border-ink-200 bg-surface p-4 shadow-xl md:max-h-none md:max-w-none md:rounded-4xl md:p-5" onClick={(e)=>e.stopPropagation()}>
-              <DateRangePicker selected={range} onSelect={setRange} numberOfMonths={isDesktopViewPort ? 2 : 1}/>
+          <div className="fixed inset-0 z-20 flex items-center justify-center p-4 md:absolute md:inset-auto md:left-1/2 md:top-22 md:block md:w-[min - (960px, calc(100vw - 2rem))] md:-translate-x-1/2" onClick={() => setActivePanel(null)}>
+            <div className="w-full max-w-md max-h-[calc(100dvh-2rem)] overflow-auto rounded-[28px] border border-ink-200 bg-surface p-4 shadow-xl md:max-h-none md:max-w-none md:rounded-4xl md:p-5" onClick={(e) => e.stopPropagation()}>
+              <DateRangePicker selected={range} onSelect={setRange} numberOfMonths={isDesktopViewPort ? 2 : 1} />
+            </div>
+          </div>
+        )
+      }
+
+      {
+        activePanel === "who" && (
+          <div className="fixed inset-0 z-20 flex items-center justify-center p-4 md:absolute md:inset-auto md:right-3 md:top-22 md:block md:w-90"
+            onClick={() => setActivePanel(null)}
+          >
+            <div className="w-full max-w-md rounded-3xl border border-ink-200 bg-surface p-5 shadow-xl md:max-w-none" onClick={(e) => e.stopPropagation()}>
+              <div className="flex items-center justify-between border-b border-ink-200 py-3">
+                <div>
+                  <p className="font-semibold text-ink-900">Adults</p>
+                  <p className="text-sm text-ink-500">Ages 13 or above</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <button className="size-8 rounded-full border border-ink-300 text-ink-700" onClick={() => setAdults((prev) => Math.max(1, prev - 1))}>-</button>
+                  <span className="w-5 text-center">{adults}</span>
+                  <button className="size-8 rounded-full border border-ink-300 text-ink-700" onClick={() => setAdults((prev) => Math.max(1, prev + 1))}>+</button>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between border-b border-ink-200 py-3">
+                <div>
+                  <p className="font-semibold text-ink-900">Children</p>
+                  <p className="text-sm text-ink-500">Ages 2 or 12</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <button className="size-8 rounded-full border border-ink-300 text-ink-700" onClick={() => setChildren((prev) => Math.max(0, prev - 1))}>-</button>
+                  <span className="w-5 text-center">{children}</span>
+                  <button className="size-8 rounded-full border border-ink-300 text-ink-700" onClick={() => setChildren((prev) => Math.max(0, prev + 1))}>+</button>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between border-b border-ink-200 py-3">
+                <div>
+                  <p className="font-semibold text-ink-900">Infants</p>
+                  <p className="text-sm text-ink-500">Under 2</p>
+                </div>
+                <div className="flex items-center gap-3">
+                  <button className="size-8 rounded-full border border-ink-300 text-ink-700" onClick={() => setInfants((prev) => Math.max(0, prev - 1))}>-</button>
+                  <span className="w-5 text-center">{infants}</span>
+                  <button className="size-8 rounded-full border border-ink-300 text-ink-700" disabled={infants >= MAX_INFANTS} onClick={() => setInfants((prev) => Math.max(0, prev + 1))}>+</button>
+                </div>
+              </div>
+
             </div>
           </div>
         )

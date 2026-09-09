@@ -1,7 +1,7 @@
 'use client'
 
 import { addDays, addMonths } from "date-fns";
-import { ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
 import { DayPicker, type DateRange, type Matcher } from "react-day-picker";
 
@@ -18,6 +18,9 @@ export function DateRangePicker({ selected, onSelect, disabled, numberOfMonths =
   return (
     <div className="w-full">
       <div className="mb-4 flex items-center justify-center gap-2">
+        <button type="button" className="rounded-full border border-ink-300 p-2 text-ink-700 transition hover:bg-ink-100 focus-visible:outline-none focus-visible:ring-2" onClick={() => setMonth((prev) => addMonths(prev, 1))}>
+          <ChevronLeft className="size-4" />
+        </button>
         <button type="button" className="rounded-full border border-ink-300 p-2 text-ink-700 transition hover:bg-ink-100 focus-visible:outline-none focus-visible:ring-2" onClick={() => setMonth((prev) => addMonths(prev, -1))}>
           <ChevronRight className="size-4" />
         </button>

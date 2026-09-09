@@ -3,6 +3,7 @@ import { ChevronRight, Flame, HomeIcon, Landmark, Mountain, Palmtree, Snowflake,
 import Link from "next/link";
 import { SafeImage } from "@/components/safe-image"
 import { HomeSearchbar } from "@/components/home-searchbar";
+import { format } from "date-fns";
 
 
 type HomePageProps = {
@@ -32,6 +33,19 @@ type UnifiedCard = {
   isExternal: boolean;
 }
 
+function groupByCity(cards: UnifiedCard[]) {
+  const grouped = new Map<string, UnifiedCard[]>()
+  for (const card of cards) {
+    const list = grouped.get(card.city) ?? []
+    list.push(card)
+    grouped.set(card.city, list)
+  }
+
+  return Array.from(grouped.entries()).map(([city, items]) => ({
+    city, items
+  }))
+}
+
 const categoryItems = [
   { label: "Secnic views", icon: Mountain },
   { label: "Beachfront", icon: Palmtree },
@@ -56,9 +70,22 @@ function normalizeUsCity(location: string) {
   return "United States"
 }
 
+function formateDateRange(checkIn?: string, checkOut?: string) {
+  if (!checkIn || !checkOut) return 'Anytime'
+  const start = new Date(checkIn)
+  const end = new Date(checkOut)
+
+  if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime())) {
+    return 'Anytime'
+  }
+
+  return `${format(start, 'MMM d')} - ${format(end, 'MMM d')}`
+}
+
 export default async function Home({ searchParams }: HomePageProps) {
   const params = await searchParams;
   const hasAnyFilter = Boolean(params.category?.trim())
+  const hasLocationSearch = Boolean(params.location?.trim())
   const demoProperties = await fetchDemoProperties()
   const allCards: UnifiedCard[] = [
     ...demoProperties.map((property, index) => ({
@@ -77,13 +104,29 @@ export default async function Home({ searchParams }: HomePageProps) {
     }))
   ]
 
-  const unifiedCards = allCards.filter((card) => {
-    const byCategory = params.category ? card.category.toLowerCase() === params.category.toLowerCase() : true
+   const requestedGuests = Number(params.adults ?? 0) + Number(params.children ?? 0) + Number(params.infants ?? 0) || Number(params.guests) || 1
 
-    return byCategory
+  const unifiedCards = allCards.filter((card) => {
+    const byLocation = params.location ? card.city.toLowerCase().includes(params.location.toLowerCase()) : true
+    const byCategory = params.category ? card.category.toLowerCase() === params.category.toLowerCase() : true
+    const byGuests = card.maxGuests >= requestedGuests
+
+    return byCategory && byLocation && byGuests
   })
 
+  const adults = Number(params.adults ?? 0) || 0;
+  const children = Number(params.children ?? 0) || 0
+  const infants = Number(params.infants ?? 0) || 0;
+  const locationLabel = params.location?.trim() || 'Anywhere';
+  const dateLabel = formateDateRange(params.checkIn, params.checkOut)
+  const guestParts: string[] = []
+  if (adults > 0) guestParts.push(`${adults} adult${adults > 1 ? 's' : ''}`)
+  if (children > 0) guestParts.push(`${children} child${children > 1 ? 'ren' : ''}`)
+  if (infants > 0) guestParts.push(`${infants} infant${infants > 1 ? 's' : ''}`)
+  const guestsLabel = guestParts.length > 0 ? guestParts.join(', ') : `${requestedGuests} guest${requestedGuests > 1 ? 's' : ''}`
+
   const limitedCards = unifiedCards.slice(0, 20)
+  const groupCards = groupByCity(limitedCards)
   const defaultGridCards = limitedCards
 
   return (
@@ -102,7 +145,7 @@ export default async function Home({ searchParams }: HomePageProps) {
         </div>
 
         <div className="mx-auto mt-7 max-w-230 md:mt-8">
-          <HomeSearchbar/>
+          <HomeSearchbar />
         </div>
 
         <div className="mx-auto mt-6 flex max-w-230 items-start justify-between gap-3">
@@ -133,53 +176,115 @@ export default async function Home({ searchParams }: HomePageProps) {
 
         <p className="mx-auto mt-3 max-w-230 text-sm text-ink-600">
           Showing stays for {" "}
-          <span className="font-medium text-ink-900">Guests</span> {' . '}
-          <span className="font-medium text-ink-900">Dates</span> {' . '}
-          <span className="font-medium text-ink-900">Location</span> {' . '}
+          <span className="font-medium text-ink-900">{guestsLabel}</span> {' . '}
+          <span className="font-medium text-ink-900">{dateLabel}</span> {' . '}
+          <span className="font-medium text-ink-900">{locationLabel}</span> {' . '}
         </p>
       </section>
 
-      <section className="mt-10 md:mt-8">
-        <div className="mb-4 flex items-center gap-2">
-          <h2 className="text-2xl font-semibold tracking-tight text-ink-900">
-            Top picks across the United states
-            <ChevronRight className="size-5 text-ink-700" />
-          </h2>
-        </div>
-        <div className="grid grid-cols-2 gap-x-4 gap-y-4 md:grid-cols-3 md:gap-4 lg:grid-cols-4">
-          {
-            defaultGridCards.map((item, index) => (
-              <Link className="block space-y-2" href="#" key={item.id}>
-                <div className="overflow-hidden rounded-xl">
-                  <SafeImage
-                    src={item.image}
-                    alt={item.title}
-                    width={420}
-                    height={280}
-                    className="h-48 w-full object-cover"
-                    priority={index < 4}
-                  />
+      {
+        unifiedCards.length === 0 ? (
+          <section className="mt-10 md:mt-8">
+            <p className="text-ink-600">No stays match your current filter. Try adjusting destination, dates, or guest count</p>
+          </section>
+        ) : (
+          <>
+            {hasLocationSearch ? (
+              <section className="mt-20 space-y-10 md:mt-8 md:space-y-9 ">
+                {
+                  groupCards.map((group) => (
+                    <div key={group.city}>
+                      <div className="mb-4 flex items-center gap-2">
+                        <h2 className="text-2xl font-semibold tracking-tight text-ink-900">
+                          Top stays in {group.city}
+                          <ChevronRight className="size-5 text-ink-700" />
+                        </h2>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-x-4 gap-y-4 md:grid-cols-3 md:gap-4 lg:grid-cols-4">
+                        {
+                          group.items.slice(0, 16).map((item, index) => (
+                            <Link className="block space-y-2" href="#" key={item.id}>
+                              <div className="overflow-hidden rounded-xl">
+                                <SafeImage
+                                  src={item.image}
+                                  alt={item.title}
+                                  width={420}
+                                  height={280}
+                                  className="h-48 w-full object-cover"
+                                  priority={index < 4}
+                                />
+                              </div>
+                              <div className="space-y-0 5 px-0.5">
+                                <p className="inline-flex rounded-full bg-ink-100 px-2 py-0.5 text-[11px] font-medium text-ink-700">
+                                  {item.city}
+                                </p>
+                                <p className="line-clamp-1 text-sm font-medium text-ink-900">{item.title}</p>
+                                <p className="line-clamp-1 text-xs text-ink-500">
+                                  ${item.price} for 2 nights
+                                  <span className="ml-1 inline-flex items-center gap-0.5">
+                                    <Star className="size-3 fill-current text-ink-700" />
+                                    {item.rating}
+                                  </span>
+                                </p>
+                              </div>
+                            </Link>
+                          ))
+                        }
+                      </div>
+                    </div>
+                  ))
+                }
+              </section>
+            ) : (
+              <section className="mt-10 md:mt-8">
+                <div className="mb-4 flex items-center gap-2">
+                  <h2 className="text-2xl font-semibold tracking-tight text-ink-900">
+                    Top picks across the United states
+                    <ChevronRight className="size-5 text-ink-700" />
+                  </h2>
                 </div>
-                <div className="space-y-0 5 px-0.5">
-                  <p className="inline-flex rounded-full bg-ink-100 px-2 py-0.5 text-[11px] font-medium text-ink-700">
-                    {item.city}
-                  </p>
-                  <p className="line-clamp-1 text-sm font-medium text-ink-900">{item.title}</p>
-                  <p className="line-clamp-1 text-xs text-ink-500">
-                    ${item.price} for 2 nights
-                    <span className="ml-1 inline-flex items-center gap-0.5">
-                      <Star className="size-3 fill-current text-ink-700" />
-                      {item.rating}
-                    </span>
-                  </p>
-                </div>
-              </Link>
-            ))
-          }
+                <div className="grid grid-cols-2 gap-x-4 gap-y-4 md:grid-cols-3 md:gap-4 lg:grid-cols-4">
+                  {
+                    defaultGridCards.map((item, index) => (
+                      <Link className="block space-y-2" href="#" key={item.id}>
+                        <div className="overflow-hidden rounded-xl">
+                          <SafeImage
+                            src={item.image}
+                            alt={item.title}
+                            width={420}
+                            height={280}
+                            className="h-48 w-full object-cover"
+                            priority={index < 4}
+                          />
+                        </div>
+                        <div className="space-y-0 5 px-0.5">
+                          <p className="inline-flex rounded-full bg-ink-100 px-2 py-0.5 text-[11px] font-medium text-ink-700">
+                            {item.city}
+                          </p>
+                          <p className="line-clamp-1 text-sm font-medium text-ink-900">{item.title}</p>
+                          <p className="line-clamp-1 text-xs text-ink-500">
+                            ${item.price} for 2 nights
+                            <span className="ml-1 inline-flex items-center gap-0.5">
+                              <Star className="size-3 fill-current text-ink-700" />
+                              {item.rating}
+                            </span>
+                          </p>
+                        </div>
+                      </Link>
+                    ))
+                  }
 
 
-        </div>
-      </section>
+                </div>
+              </section >
+            )
+            }
+          </>
+        )
+      }
+
+
 
       <footer className="mt-16 rounded-3xl border border-ink-200 bg-surface p-6 shadow-sm md:mt-14 md:p-7">
         <div className="grid gap-8 md:grid-cols-4">
@@ -189,7 +294,7 @@ export default async function Home({ searchParams }: HomePageProps) {
               Discover carefully curated US stays with booking flow designed for clairty and confidence. Compare homes quickly and reserver with ease.
             </p>
             <p className="mt-5 inline-flex items-center gap-1 text-xs text-ink-500">
-              <Users className="siz-3.5"/>
+              <Users className="siz-3.5" />
               Powered by curated sample listing data focused on US destinations.
             </p>
           </div>
@@ -218,6 +323,6 @@ export default async function Home({ searchParams }: HomePageProps) {
           &copy; {new Date().getFullYear()} staysCape. All rights reserved.
         </div>
       </footer>
-    </main>
+    </main >
   );
 }
