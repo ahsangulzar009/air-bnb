@@ -3,9 +3,10 @@
 import { toValidate } from "@/lib/date-utils";
 import { format } from "date-fns";
 import { Search } from "lucide-react";
-import { act, useMemo, useRef, useState } from "react";
+import { act, useEffect, useMemo, useRef, useState } from "react";
 import type { DateRange } from "react-day-picker";
 import { useFormStatus } from "react-dom";
+import { DateRangePicker } from "./date-range-picker";
 
 
 type HomerSearchbarProps = {
@@ -62,6 +63,15 @@ export function HomeSearchbar({
     return 'Add dates'
   }, [])
 
+  useEffect(()=>{
+    const mediaQuery = window.matchMedia('(min-width: 760px');
+    const syncViewPort = () => setIsDesktopViewPort(mediaQuery.matches);
+    syncViewPort()
+    mediaQuery.addEventListener('change', syncViewPort);
+
+    return () => mediaQuery.removeEventListener('change', syncViewPort)
+  },[])
+
   return (
     <div className="relative rounded-4xl bg-surface p-2.5 shadow-sm md:border md:border-ink-200 md:p-4">
       {
@@ -79,6 +89,7 @@ export function HomeSearchbar({
           <button
             className="w-full rounded-xl border border-ink-200 bg-surface px-4 py-2.5 text-left shadow-sm shadow-ink-900/5 transition hover:bg-ink-100 md:border-transparent md:bg-transparent md:shadow-none"
             onClick={() => setActivePanel(activePanel === 'where' ? null : 'where')}
+            type="button"
           >
             <span className="block text-xs font-semibold text-ink-900">Where</span>
             <span className="block text-sm text-ink-600">{location || "Choose a destination"}</span>
@@ -87,16 +98,18 @@ export function HomeSearchbar({
           <button
             className="w-full rounded-xl border border-ink-200 bg-surface px-4 py-2.5 text-left shadow-sm shadow-ink-900/5 transition hover:bg-ink-100 md:border-transparent md:bg-transparent md:shadow-none"
             onClick={() => setActivePanel(activePanel === 'when' ? null : 'when')}
+            type="button"
           >
             <span className="block text-xs font-semibold text-ink-900">When</span>
             <span className="block text-sm text-ink-600">
-             {whenLabel}
+              {whenLabel}
             </span>
           </button>
 
           <button
             className="w-full rounded-xl border border-ink-200 bg-surface px-4 py-2.5 text-left shadow-sm shadow-ink-900/5 transition hover:bg-ink-100 md:border-transparent md:bg-transparent md:shadow-none"
             onClick={() => setActivePanel(activePanel === 'who' ? null : 'who')}
+            type="button"
           >
             <span className="block text-xs font-semibold text-ink-900">Who</span>
             <span className="block text-xs font-semibold text-ink-900">
@@ -113,6 +126,7 @@ export function HomeSearchbar({
           <button
             className="w-full rounded-xl border border-ink-200 bg-surface px-4 py-2.5 text-left shadow-sm shadow-ink-900/5 transition hover:bg-ink-100 md:border-transparent md:bg-transparent md:shadow-none"
             onClick={() => setActivePanel(activePanel === 'where' ? null : 'where')}
+            type="button"
           >
             <span className="block text-xs font-semibold text-ink-900">Where</span>
             <span className="block text-sm text-ink-600">{location || "Choose a destination"}</span>
@@ -121,6 +135,7 @@ export function HomeSearchbar({
           <button
             className="w-full rounded-xl border border-ink-200 bg-surface px-4 py-2.5 text-left shadow-sm shadow-ink-900/5 transition hover:bg-ink-100 md:border-transparent md:bg-transparent md:shadow-none"
             onClick={() => setActivePanel(activePanel === 'when' ? null : 'when')}
+            type="button"
           >
             <span className="block text-xs font-semibold text-ink-900">When</span>
             <span className="block text-sm text-ink-600">
@@ -131,6 +146,7 @@ export function HomeSearchbar({
           <button
             className="w-full rounded-xl border border-ink-200 bg-surface px-4 py-2.5 text-left shadow-sm shadow-ink-900/5 transition hover:bg-ink-100 md:border-transparent md:bg-transparent md:shadow-none"
             onClick={() => setActivePanel(activePanel === 'who' ? null : 'who')}
+            type="button"
           >
             <span className="block text-xs font-semibold text-ink-900">Who</span>
             <span className="block text-xs font-semibold text-ink-900">
@@ -139,7 +155,49 @@ export function HomeSearchbar({
           </button>
           <SearchSubmitButton />
         </div>
+
+        {/* Synced to URL on submit */}
+        <input type="hidden" name="location" value={location} />
+        <input type="hidden" name="guests" value={totalGuests} />
+        <input type="hidden" name="adults" value={adults} />
+        <input type="hidden" name="children" value={children} />
+        <input type="hidden" name="infants" value={infants} />
+        <input type="hidden" name="checkIn" value={range?.from ? format(range.from, 'yyyy-MM-dd') : ""} />
+        <input type="hidden" name="checkOut" value={range?.to ? format(range.to, 'yyyy-MM-dd') : ""} />
       </form>
+
+      {
+        activePanel === 'where' && (
+          <div className="fixed inset-0 z-20 flex items-center justify-center p-4 md:absolute md:inset-auto md:left-3 md:top-22 md:block md:w-105">
+            <div className="w-full max-w-md rounded-3xl border border-ink-200 bg-surface p-4 shadow-xl md:max-w-none">
+              <p className="mb-2 text-sm font-semibold text-ink-900">Popular destination</p>
+              {
+                [
+                  "New York, United States",
+                  "Los Angles, United States",
+                  "Miami, United States",
+                  "Chicago, United States",
+                  "San Francisco, United States",
+                ].map((city) => (
+                  <button className="block w-full rounded-xl px-3 py-2 text-left text-sm text-ink-700 hover:bg-ink-100" key={city} type="button" onClick={() => { setLocation(city); setActivePanel(null) }}>
+                    {city}
+                  </button>
+                ))
+              }
+            </div>
+          </div>
+        )
+      }
+
+      {
+        activePanel === 'when' && (
+          <div className="fixed inset-0 z-20 flex items-center justify-center p-4 md:absolute md:inset-auto md:left-1/2 md:top-22 md:block md:w-[min - (960px, calc(100vw - 2rem))] md:-translate-x-1/2" onClick={()=>setActivePanel(null)}>
+            <div className="w-full max-w-md max-h-[calc(100dvh-2rem)] overflow-auto rounded-[28px] border border-ink-200 bg-surface p-4 shadow-xl md:max-h-none md:max-w-none md:rounded-4xl md:p-5" onClick={(e)=>e.stopPropagation()}>
+              <DateRangePicker selected={range} onSelect={setRange} numberOfMonths={isDesktopViewPort ? 2 : 1}/>
+            </div>
+          </div>
+        )
+      }
     </div>
   )
 
