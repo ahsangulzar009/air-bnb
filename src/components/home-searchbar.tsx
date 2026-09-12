@@ -3,7 +3,7 @@
 import { toValidate } from "@/lib/date-utils";
 import { format } from "date-fns";
 import { Search } from "lucide-react";
-import { act, useEffect, useMemo, useRef, useState } from "react";
+import {  useEffect, useMemo, useRef, useState } from "react";
 import type { DateRange } from "react-day-picker";
 import { useFormStatus } from "react-dom";
 import { DateRangePicker } from "./date-range-picker";
@@ -85,7 +85,7 @@ export function HomeSearchbar({
         )
       }
 
-      <form action="" className="rounded-[28px] border border-ink-300 p-2.5 shadow-sm md:rounded-full md:p-1.5">
+      <form  className="rounded-[28px] border border-ink-300 p-2.5 shadow-sm md:rounded-full md:p-1.5">
         <div className="space-y-2 md:hidden">
           <button
             className="w-full rounded-xl border border-ink-200 bg-surface px-4 py-2.5 text-left shadow-sm shadow-ink-900/5 transition hover:bg-ink-100 md:border-transparent md:bg-transparent md:shadow-none"

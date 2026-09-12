@@ -70,6 +70,42 @@ function normalizeUsCity(location: string) {
   return "United States"
 }
 
+function buildDateRangeInclusive(start: Date, end: Date) {
+  const dates: string[] = []
+  const cursor = new Date(start)
+  while (cursor <= end) {
+    dates.push(cursor.toISOString().slice(0, 10));
+    cursor.setDate(cursor.getDate() + 1)
+  }
+
+  return dates
+}
+
+function isRangeAvailable(
+  availableDates: string[],
+  checkIn?: string,
+  checkOut?: string
+) {
+  if (!checkIn || !checkOut) return true
+  const start = new Date(checkIn)
+  const end = new Date(checkOut)
+
+  if (Number.isNaN(start.getTime()) || Number.isNaN(end.getTime()) || end < start) {
+    return true
+  }
+
+  const requested = buildDateRangeInclusive(start, end);
+  if (availableDates.length === 0) return true
+
+  const mdset = new Set(
+    availableDates
+      .filter((d) => /^\d{4}-\d{2}$/.test(d))
+      .map((d) => d.slice(5))
+  )
+
+  return requested.every((d) => mdset.has(d.slice(5)))
+}
+
 function formateDateRange(checkIn?: string, checkOut?: string) {
   if (!checkIn || !checkOut) return 'Anytime'
   const start = new Date(checkIn)
@@ -84,6 +120,7 @@ function formateDateRange(checkIn?: string, checkOut?: string) {
 
 export default async function Home({ searchParams }: HomePageProps) {
   const params = await searchParams;
+  const buildListingHref = (listingId: string) =>`/listing/${listingId}`
   const hasAnyFilter = Boolean(params.category?.trim())
   const hasLocationSearch = Boolean(params.location?.trim())
   const demoProperties = await fetchDemoProperties()
@@ -104,7 +141,7 @@ export default async function Home({ searchParams }: HomePageProps) {
     }))
   ]
 
-   const requestedGuests = Number(params.adults ?? 0) + Number(params.children ?? 0) + Number(params.infants ?? 0) || Number(params.guests) || 1
+  const requestedGuests = Number(params.adults ?? 0) + Number(params.children ?? 0) + Number(params.infants ?? 0) || Number(params.guests) || 1
 
   const unifiedCards = allCards.filter((card) => {
     const byLocation = params.location ? card.city.toLowerCase().includes(params.location.toLowerCase()) : true
@@ -145,7 +182,15 @@ export default async function Home({ searchParams }: HomePageProps) {
         </div>
 
         <div className="mx-auto mt-7 max-w-230 md:mt-8">
-          <HomeSearchbar />
+          <HomeSearchbar
+            initialAdults={params.adults}
+            initialLocation={params.location}
+            initialGuests={params.guests}
+            initialChildren={params.children}
+            initialCheckIn={params.checkIn}
+            initialCheckOut={params.checkOut}
+            initialInfants={params.infants}
+          />
         </div>
 
         <div className="mx-auto mt-6 flex max-w-230 items-start justify-between gap-3">
@@ -157,8 +202,10 @@ export default async function Home({ searchParams }: HomePageProps) {
                 return (
                   <Link
                     key={items.label}
-                    href={`/?category=${encodeURIComponent(items.label)}`}
+                    href={`/?category=${encodeURIComponent(items.label)}${params.location ? `&location=${encodeURIComponent(params.location)}` : ''}${params.guests ? `&guests=${encodeURIComponent(params.guests)}` : ''}${params.adults ? `&adults=${encodeURIComponent(params.adults)}` : ''}${params.children ? `&children=${encodeURIComponent(params.children)}` : ''}${params.infants ? `&infants=${encodeURIComponent(params.infants)}` : ''}${params.adults ? `&adults=${encodeURIComponent(params.adults)}` : ''}${params.checkIn ? `&checkIn=${encodeURIComponent(params.checkIn)}` : ''}${params.checkOut ? `&checkOut=${encodeURIComponent(params.checkOut)}` : ''}`}
+                    scroll={false}
                     className={`inline-flex shrink-0 items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition ${isActive ? "border-ink-900 bg-ink-900 text-white" : "border-ink-300 text-ink-700 hover:bg-ink-100"}`}
+
                   >
                     <Icon className="size-4" />
                     <span>{items.label}</span>
@@ -204,7 +251,7 @@ export default async function Home({ searchParams }: HomePageProps) {
                       <div className="grid grid-cols-2 gap-x-4 gap-y-4 md:grid-cols-3 md:gap-4 lg:grid-cols-4">
                         {
                           group.items.slice(0, 16).map((item, index) => (
-                            <Link className="block space-y-2" href="#" key={item.id}>
+                            <Link className="block space-y-2" href={buildListingHref(item.id)} key={item.id}>
                               <div className="overflow-hidden rounded-xl">
                                 <SafeImage
                                   src={item.image}
@@ -247,7 +294,7 @@ export default async function Home({ searchParams }: HomePageProps) {
                 <div className="grid grid-cols-2 gap-x-4 gap-y-4 md:grid-cols-3 md:gap-4 lg:grid-cols-4">
                   {
                     defaultGridCards.map((item, index) => (
-                      <Link className="block space-y-2" href="#" key={item.id}>
+                      <Link className="block space-y-2" href={buildListingHref(item.id)} key={item.id}>
                         <div className="overflow-hidden rounded-xl">
                           <SafeImage
                             src={item.image}
