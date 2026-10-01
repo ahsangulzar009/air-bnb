@@ -85,7 +85,7 @@ model Reservation{
 id String @id @default(cuid())
 startDate DateTime
 endDate DateTime
-totalPrice DateTime
+totalPrice Decimal @db.Decimal(10, 2)
 createdAt DateTime @default(now())
 
 

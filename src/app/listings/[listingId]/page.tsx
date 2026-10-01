@@ -4,6 +4,10 @@ import { fetchDemoProperties } from '@/seed/demo/demo-properties';
 import { notFound } from 'next/navigation'
 import ListingImageGallery from './_components/ListingImageGallery';
 import ListingHeaderInfo from './_components/ListingHeaderInfo';
+import ListingAbout from './_components/ListingAbout';
+import ListingBookedRanges from './_components/ListingBookedRanges';
+import ListingMap from './_components/ListingMap';
+import ListingBookingSidebar from './_components/ListingBookingSidebar';
 
 type ListingPageProps = {
   params: Promise<{ listingId: string }>
@@ -77,10 +81,23 @@ const ListingPage = async ({ params, searchParams }: ListingPageProps) => {
       : Promise.resolve(null)
   ])
 
+  const bookedRanges = recentReservation.map((reservation) => ({
+    startDate: reservation.startDate,
+    endDate: reservation.endDate
+  }))
+
+  const bookingStatus = query.booking === 'success' || query.booking === 'error' ? query.booking : null
+  const bookingMessage = query.message ?? null;
+  const initialCheckIn = query.checkIn;
+  const initialCheckOut = query.checkOut;
+  const initialAdults = query.adults;
+  const initialChildren = query.children;
+  const initialInfants = query.infants;
+
   return (
     <main className="mx-auto min-h-screen max-w-7xl px-4 pb-28 pt-5 md:px-8 md:pb-10 md:pt-8">
       <article className="space-y-6 md:space-y-8">
-        <div className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_mimax(320px,1fr) lg:items-start]">
+        <div className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(320px,1fr)] lg:items-start">
           <div className="order-2 space-y-6 md:space-y-7 lg:order-1">
             <section>
               <ListingImageGallery
@@ -98,15 +115,37 @@ const ListingPage = async ({ params, searchParams }: ListingPageProps) => {
                 listingStatusLabel={isDemoListing ? "Featured demo listing" : reservationCount > 0 ? `${reservationCount} confirmed booking ${reservationCount > 1 ? 's' : ''}` : "Newly listed"}
               />
             </section>
-            <p>ListingAbout</p>
+            <ListingAbout
+              description={listing.description}
+              guestCount={listing.guestCount}
+              roomCount={listing.roomCount}
+              bathroomCount={listing.bathroomCount}
+              hostName={listing.hostName}
+              hostRating={hostRating}
+            />
 
-            <p>ListingBookedRanges</p>
+            <ListingBookedRanges bookedRanges={bookedRanges} />
 
-            <p>ListingMap</p>
+            <ListingMap locationValue={listing.locationValue} />
           </div>
 
           <div className="order-1 lg:order-2">
-            <p>ListingBookingSIdebar</p>
+            <ListingBookingSidebar
+              listingId={listing.id}
+              pricePerNight={listing.pricePerNight}
+              hostName={listing.hostName}
+              reservationCount={reservationCount}
+              userActiveReservation={userActiveReservation}
+              maxGuests={listing.guestCount}
+              isLoggedIn={Boolean(user)}
+              bookingStatus={bookingStatus}
+              bookingMessage={bookingMessage}
+              unavailableRanges={bookedRanges}
+              initialCheckIn={initialCheckIn}
+              initialCheckOut={initialCheckOut}
+              initialChildren={initialChildren}
+              initialInfants={initialInfants}
+             />
           </div>
 
         </div>
