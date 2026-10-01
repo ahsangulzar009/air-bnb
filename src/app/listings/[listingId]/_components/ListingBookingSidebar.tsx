@@ -1,4 +1,5 @@
 import { CalendarCheck2 } from "lucide-react";
+import ListingReservationForm from "../ListingReservationForm";
 
 
 interface ListingBookingSidebarProps {
@@ -17,6 +18,7 @@ interface ListingBookingSidebarProps {
   initialCheckIn?: string;
   initialCheckOut?: string;
   initialChildren?: string;
+  initialAdults?: string;
   initialInfants?: string;
   unavailableRanges: Array<{
     startDate: Date;
@@ -37,6 +39,7 @@ const ListingBookingSidebar = (
     bookingMessage,
     initialCheckIn,
     initialCheckOut,
+    initialAdults,
     initialChildren,
     initialInfants,
     unavailableRanges
@@ -80,7 +83,20 @@ const ListingBookingSidebar = (
         <p className="mt-1 text-ink-500 md:hidden">Hosted by {hostName}</p>
 
         <div className="mt-4">
-          <p>Listing Reservation Form</p>
+          <ListingReservationForm
+            listingId={listingId}
+            pricePerNight={pricePerNight}
+            maxGuests={maxGuests}
+            isLoggedIn={isLoggedIn}
+            bookingStatus={bookingStatus}
+            bookingMessage={bookingMessage}
+            initialCheckIn={initialCheckIn}
+            initialCheckOut={initialCheckOut}
+            initialAdults={initialAdults}
+            initialChildren={initialChildren}
+            initialInfants={initialInfants}
+            unavailableRanges={unavailableRanges}
+          />
         </div>
 
       </section>

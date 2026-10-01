@@ -142,6 +142,7 @@ const ListingPage = async ({ params, searchParams }: ListingPageProps) => {
               bookingMessage={bookingMessage}
               unavailableRanges={bookedRanges}
               initialCheckIn={initialCheckIn}
+              initialAdults={initialAdults}
               initialCheckOut={initialCheckOut}
               initialChildren={initialChildren}
               initialInfants={initialInfants}
