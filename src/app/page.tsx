@@ -120,7 +120,7 @@ function formateDateRange(checkIn?: string, checkOut?: string) {
 
 export default async function Home({ searchParams }: HomePageProps) {
   const params = await searchParams;
-  const buildListingHref = (listingId: string) =>`/listing/${listingId}`
+  const buildListingHref = (listingId: string) =>`/listings/${listingId}`
   const hasAnyFilter = Boolean(params.category?.trim())
   const hasLocationSearch = Boolean(params.location?.trim())
   const demoProperties = await fetchDemoProperties()
