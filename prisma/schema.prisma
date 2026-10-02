@@ -71,7 +71,7 @@ roomCount Int
 bathroomCount Int
 guestCount Int
 locationValue String
-priceOerNight Int
+pricePerNight Int
 createdAt DateTime @default(now())
 uodatedAt DateTime @updatedAt
 

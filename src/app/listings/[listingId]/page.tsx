@@ -48,7 +48,7 @@ const ListingPage = async ({ params, searchParams }: ListingPageProps) => {
     locationValue: dbListing.locationValue,
     imageSrc: dbListing.imageSrc,
     imageGallery: dbListing.imageGallery,
-    pricePerNight: dbListing.priceOerNight,
+    pricePerNight: dbListing.pricePerNight,
     category: dbListing.category,
     guestCount: dbListing.guestCount,
     roomCount: dbListing.roomCount,

@@ -120,7 +120,17 @@ function formateDateRange(checkIn?: string, checkOut?: string) {
 
 export default async function Home({ searchParams }: HomePageProps) {
   const params = await searchParams;
-  const buildListingHref = (listingId: string) =>`/listings/${listingId}`
+  const listingQueryParams = new URLSearchParams();
+  if (params.location) listingQueryParams.set("location", params.location)
+  if (params.checkIn) listingQueryParams.set("checkIn", params.checkIn)
+  if (params.checkOut) listingQueryParams.set("checkOut", params.checkOut)
+  if (params.guests) listingQueryParams.set("guests", params.guests)
+  if (params.adults) listingQueryParams.set("adults", params.adults)
+  if (params.children) listingQueryParams.set("children", params.children)
+  if (params.infants) listingQueryParams.set("infants", params.infants)
+  const listingQuery = listingQueryParams.toString()
+
+  const buildListingHref = (listingId: string) => `/listings/${listingId}${listingQuery ? `?${listingQuery}` : ''}`
   const hasAnyFilter = Boolean(params.category?.trim())
   const hasLocationSearch = Boolean(params.location?.trim())
   const demoProperties = await fetchDemoProperties()

@@ -1,5 +1,5 @@
 import { CalendarCheck2 } from "lucide-react";
-import ListingReservationForm from "../ListingReservationForm";
+import ListingReservationForm from "./ListingReservationForm";
 
 
 interface ListingBookingSidebarProps {
@@ -59,7 +59,7 @@ const ListingBookingSidebar = (
         </div>
         {
           userActiveReservation && (
-            <div className="mt-3 rounded-3xl border border-emerald-200 bg-linear-to-r from-emerald-50 to-emerald-100/70 p-3 shadow-sm shadow-emerald-900/50">
+            <div className="mt-3 rounded-2xl border border-emerald-200 bg-linear-to-r from-emerald-50 to-emerald-100/70 p-3 shadow-sm shadow-emerald-900/50">
               <div className="flex items-center gap-2.5">
                 <span className="inline-flex size-7 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-white">
                   <CalendarCheck2 className="size-4" />
