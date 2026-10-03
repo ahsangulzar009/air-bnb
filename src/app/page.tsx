@@ -130,8 +130,18 @@ export default async function Home({ searchParams }: HomePageProps) {
   if (params.infants) listingQueryParams.set("infants", params.infants)
   const listingQuery = listingQueryParams.toString()
 
+  const hasAnyFilter = Boolean(
+    params.location?.trim() ||
+    params.category?.trim() ||
+    params.checkIn?.trim() ||
+    params.checkOut?.trim() ||
+    params.guests?.trim() ||
+    params.adults?.trim() ||
+    params.children?.trim() ||
+    params.infants?.trim()
+  )
+
   const buildListingHref = (listingId: string) => `/listings/${listingId}${listingQuery ? `?${listingQuery}` : ''}`
-  const hasAnyFilter = Boolean(params.category?.trim())
   const hasLocationSearch = Boolean(params.location?.trim())
   const demoProperties = await fetchDemoProperties()
   const allCards: UnifiedCard[] = [
@@ -151,7 +161,7 @@ export default async function Home({ searchParams }: HomePageProps) {
     }))
   ]
 
-  const requestedGuests = Number(params.adults ?? 0) + Number(params.children ?? 0) + Number(params.infants ?? 0) || Number(params.guests) || 1
+  const requestedGuests = Number(params.adults ?? 0) + Number(params.children ?? 0) + Number(params.infants ?? 0) || Number(params.guests ?? 1) || 1
 
   const unifiedCards = allCards.filter((card) => {
     const byLocation = params.location ? card.city.toLowerCase().includes(params.location.toLowerCase()) : true
@@ -173,7 +183,7 @@ export default async function Home({ searchParams }: HomePageProps) {
   const guestsLabel = guestParts.length > 0 ? guestParts.join(', ') : `${requestedGuests} guest${requestedGuests > 1 ? 's' : ''}`
 
   const limitedCards = unifiedCards.slice(0, 20)
-  const groupCards = groupByCity(limitedCards)
+  const groupCards = groupByCity(limitedCards).slice(0, 8)
   const defaultGridCards = limitedCards
 
   return (
