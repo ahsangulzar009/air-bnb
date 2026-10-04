@@ -1,3 +1,7 @@
+
+x-db-url: &db-url
+  DATABASE_URL: postgresql://air-bnb:airbnb1122@postgis:5432/air-bnb
+
 services:
   postgis:
     image: postgis/postgis:16-3.4
@@ -14,6 +18,24 @@ services:
     networks:
       - airbnb-network
 
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: airbnb_app
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    environment:
+      <<: *db-url
+    networks:
+      - airbnb-network
+
 networks:
   airbnb-network:
     driver: bridge
+
+volumes:
+  airbnb_pgdata:
