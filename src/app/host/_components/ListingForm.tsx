@@ -5,6 +5,7 @@ import { useUploadThing } from "@/lib/uploadthing";
 import { ImageUp, X } from "lucide-react";
 import { useState } from "react";
 import { useFormStatus } from "react-dom";
+import { toast } from "react-hot-toast";
 
 interface props {
   action: (FormData: FormData) => Promise<void>;
@@ -66,12 +67,29 @@ const ListingForm = ({ action, submitLabel = "Publish listing", submittingLabel 
     }
 
     setUploadError('')
-    await startUpload(list.slice(0, 10 - galleryImages.length))
+    const toastId = toast.loading(
+      `Uploading ${list.length} image${list.length > 1 ? 's' : ''}...`
+    );
+
+    try {
+      const res = await startUpload(list.slice(0, 10 - galleryImages.length));
+      if (res) {
+        toast.success(
+          `${res.length} image${res.length > 1 ? 's' : ''} uploaded`,
+          { id: toastId }
+        );
+      } else {
+        toast.error("Upload failed", { id: toastId });
+      }
+    } catch {
+      toast.error("Upload failed", { id: toastId });
+    }
   }
 
   function removeImage(imageurl: string) {
     setGalleryImages(prev => prev.filter((image) => image !== imageurl))
   }
+
 
   return (
     <form action={action} className="mt-4 grid md:grid-cols-2">
@@ -105,7 +123,7 @@ const ListingForm = ({ action, submitLabel = "Publish listing", submittingLabel 
           <ImageUp className="size-6 text-brand-500" />
           <p className="test-sm font-semibold text-ink-800">Drag and drop images, or click to upload</p>
           <p className="text-xs text-ink-500">
-            Up to 10 images, each max 4MB {isUploading && "Uploading..."}
+            Up to 10 images, each max 4MB
           </p>
         </label>
 
@@ -129,7 +147,7 @@ const ListingForm = ({ action, submitLabel = "Publish listing", submittingLabel 
                         height={160}
                         className="size-24 rounded-lg border border-ink-200 object-cover"
                       />
-                      <button className="absolute -right-1.5 -top-1.5 rounded-full bordr border-ink-200 bg-surface px-1.5 py-0.5 text-[10px] font-semibold text-ink-700 hover:bg-ink-100" aria-label={`Remove image ${index + 1}`} type="button" onClick={() => removeImage(image)}><X className="size-4"/></button>
+                      <button className="absolute -right-1.5 -top-1.5 rounded-full bordr border-ink-200 bg-surface px-1.5 py-0.5 text-[10px] font-semibold text-ink-700 hover:bg-ink-100" aria-label={`Remove image ${index + 1}`} type="button" onClick={() => removeImage(image)}><X className="size-4" /></button>
                     </div>
                   ))
                 }

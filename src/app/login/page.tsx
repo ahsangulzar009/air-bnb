@@ -57,7 +57,6 @@ const LoginPage = () => {
       }
 
       toast.success(isSignUp ? "Account created and logged in!" : "Logged in successfully!", { id: toastId });
-      // router.push(callbackUrl);
       router.refresh();
 
     } catch (error) {
