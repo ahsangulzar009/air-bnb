@@ -52,7 +52,7 @@ const ListingPage = async ({ params, searchParams }: ListingPageProps) => {
     category: dbListing.category,
     guestCount: dbListing.guestCount,
     roomCount: dbListing.roomCount,
-    bathroomCount: dbListing.roomCount,
+    bathroomCount: dbListing.bathroomCount,
     hostName: dbListing.user?.name ?? "Verified Host"
   } : {
     id: demoListing!.id,

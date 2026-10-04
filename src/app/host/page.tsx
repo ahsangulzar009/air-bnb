@@ -7,6 +7,9 @@ import StatsCard from '../bookings/_components/StatsCard';
 import HostSection from './_components/HostSection';
 import Link from 'next/link';
 import EmptyState from '../bookings/_components/EmptyState';
+import ListingForm from './_components/ListingForm';
+import { createListing } from '../actions';
+import { HostListingItem } from './_components/HostListingItem';
 
 const HostPage = async () => {
   const user = await requireUser()
@@ -33,7 +36,7 @@ const HostPage = async () => {
 
       <div className="mt-6 grid gap-6 xl:grid-cols-[1.1fr_1fr]">
         <HostSection title="Create a listing" description="Add a professionally presented listing with photos, pricing, and guest details.">
-          <p>ListingForm</p>
+          <ListingForm action={createListing} />
         </HostSection>
 
         <HostSection
@@ -54,8 +57,12 @@ const HostPage = async () => {
                 />
               ) : (
                 listings.map((listing, index) => (
-                <p></p>
-              ))
+                  <HostListingItem
+                  key={listing.id}
+                  listing={listing}
+                  index={index}
+                />
+                ))
               )
             }
           </div>

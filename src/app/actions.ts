@@ -20,6 +20,20 @@ const reservationSchema = z.object({
   children: z.coerce.number().int().min(0),
   infants: z.coerce.number().int().min(0).max(MAX_INFANTS),
 })
+
+const listingSchema = z.object({
+  title: z.string().min(5, "Title must be atleast 5 character"),
+  description: z.string().min(10, "Description must be atleast 10 character"),
+  imageSrc: z.string("Image is required"),
+  imageGallery: z.array(z.string().min(1, "Image is required")).max(10, "Image does not increase from 10"),
+  category: z.string().min(2, "Minimum 2 category is required"),
+  roomCount: z.coerce.number().int().min(1, "Room is required"),
+  bathroomCount: z.coerce.number().int().min(1, "Bathroom is required"),
+  guestCount: z.coerce.number().int().min(1, "Guest room is required"),
+  locationValue: z.string().min(2),
+  pricePerNight: z.coerce.number().min(10, "Price must be atleast 10")
+})
+
 export async function createReservation(formData: FormData) {
   const user = await requireUser();
   const fallbackListingId = String(formData.get("listingId") ?? '')
@@ -105,4 +119,92 @@ export async function cancelReservation(formData: FormData) {
   revalidatePath(`/listings/${reservation.listingId}`)
   revalidatePath('/host')
   redirect('/bookings?message=Reservation cancelled successfully')
+}
+
+function parsedListingGallery(rawGallery: FormDataEntryValue) {
+  try {
+    const value = JSON.parse(String(rawGallery ?? "[]"))
+    return Array.isArray(value) ? value : []
+  } catch (error) {
+    return []
+  }
+}
+
+export async function createListing(formData: FormData) {
+  const user = await requireUser()
+  const parsedGallery = parsedListingGallery(formData.get('imageGallery')!)
+
+  const parsed = listingSchema.safeParse({
+    title: formData.get("title"),
+    description: formData.get("description"),
+    imageSrc: formData.get("imageSrc"),
+    imageGallery: parsedGallery,
+    category: formData.get("category"),
+    roomCount: formData.get("roomCount"),
+    bathroomCount: formData.get("bathroomCount"),
+    guestCount: formData.get("guestCount"),
+    locationValue: formData.get("locationValue"),
+    pricePerNight: formData.get("pricePerNight")
+  });
+
+  if (!parsed.success)
+    
+    throw new Error("Invalid listing payload.");
+  await prisma.listing.create({
+    data: {
+      ...parsed.data,
+      userId: user.user.id
+    }
+  });
+  revalidatePath("/");
+  revalidatePath("/host");
+}
+export async function deleteListing(formData: FormData) {
+    const user = await requireUser();
+    const listingId = String(formData.get("listingId") ?? "");
+    if (!listingId)
+        throw new Error("Listing id is missing.");
+    await prisma.listing.deleteMany({
+        where: {
+            id: listingId,
+            userId: user.user.id
+        }
+    });
+    revalidatePath("/");
+    revalidatePath("/host");
+}
+export async function updateListing(listingId: string, formData: FormData) {
+    const user = await requireUser();
+    if (!listingId)
+        throw new Error("Listing id is missing.");
+    const parsedGallery = parsedListingGallery(formData.get("imageGallery")!);
+
+    const parsed = listingSchema.safeParse({
+        title: formData.get("title"),
+        description: formData.get("description"),
+        imageSrc: formData.get("imageSrc"),
+        imageGallery: parsedGallery,
+        category: formData.get("category"),
+        roomCount: formData.get("roomCount"),
+        bathroomCount: formData.get("bathroomCount"),
+        guestCount: formData.get("guestCount"),
+        locationValue: formData.get("locationValue"),
+        pricePerNight: formData.get("pricePerNight")
+    });
+    if (!parsed.success)
+        throw new Error("Invalid listing payload.");
+    const updated = await prisma.listing.updateMany({
+        where: {
+            id: listingId,
+            userId: user.user.id
+        },
+        data: parsed.data
+    });
+    if (updated.count === 0) {
+        throw new Error("Listing not found or access denied.");
+    }
+    revalidatePath("/");
+    revalidatePath("/host");
+    revalidatePath(`/listings/${listingId}`);
+    redirect("/host");
 }

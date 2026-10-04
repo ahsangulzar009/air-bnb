@@ -15,7 +15,7 @@ const HostSection = ({ title, description, action, children }: props) => {
           <h2 className="text-lg font-semibold text-ink-900 md:text-xl">{title}</h2>
           {description && <p className="mt-1 text-sm text-ink-600">{description}</p>}
         </div>
-        {action && <div>{action}</div>}
+        {action && <div className="mt-2">{action}</div>}
       </div>
       {children}
     </section>

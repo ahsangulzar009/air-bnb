@@ -37,7 +37,7 @@
     ".next/types/**/*.ts",
     "src/**/*.tsx",
     ".next/dev/types/**/*.ts"
-  ],
+,     "src/app/api/uploadthing"  ],
   "exclude": [
     "node_modules"
   ]
