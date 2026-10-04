@@ -40,7 +40,7 @@ async function  upsertDemoListingRow(hostId: string, property:DemoProperty) {
       bathroomCount,
       guestCount: property.maxGuests,
       locationValue: property.city,
-      priceOerNight: property.pricePerNight,
+      pricePerNight: property.pricePerNight,
       userId: hostId
     },
     update:{
@@ -53,7 +53,7 @@ async function  upsertDemoListingRow(hostId: string, property:DemoProperty) {
       bathroomCount,
       guestCount: property.maxGuests,
       locationValue: property.city,
-      priceOerNight: property.pricePerNight,
+      pricePerNight: property.pricePerNight,
       userId: hostId
     }
   })

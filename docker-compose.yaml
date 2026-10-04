@@ -1,0 +1,19 @@
+services:
+  postgis:
+    image: postgis/postgis:16-3.4
+    container_name: airbnb_db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: air-bnb
+      POSTGRES_PASSWORD: airbnb1122
+      POSTGRES_DB: air-bnb
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./airbnbPgdata:/var/lib/postgresql/data
+    networks:
+      - airbnb-network
+
+networks:
+  airbnb-network:
+    driver: bridge

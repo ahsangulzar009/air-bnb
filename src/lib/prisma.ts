@@ -1,4 +1,5 @@
-import { PrismaNeon } from '@prisma/adapter-neon';
+// import { PrismaNeon } from '@prisma/adapter-neon';
+import { PrismaPg } from '@prisma/adapter-pg'
 import {PrismaClient} from '../../prisma/generated/prisma/client'
 
 const globalForPrisma = globalThis as unknown as {
@@ -8,9 +9,11 @@ const globalForPrisma = globalThis as unknown as {
 const connectionString= process.env.DATABASE_URL
 if(!connectionString) throw new Error("Mising DB Url")
 
-const adapter = new PrismaNeon({
-  connectionString
-})
+// const adapter = new PrismaNeon({
+//   connectionString
+// })
+
+const adapter = new PrismaPg({ connectionString })
 
 const prismaLogLevel = process.env.PRISMA_LOG_QUERIES === 'true' ? (['query', 'error'] as const) : (['error'] as const)
 
