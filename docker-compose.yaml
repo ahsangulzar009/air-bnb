@@ -8,9 +8,9 @@ services:
     container_name: airbnb_db
     restart: unless-stopped
     environment:
-      POSTGRES_USER: air-bnb
-      POSTGRES_PASSWORD: airbnb1122
-      POSTGRES_DB: air-bnb
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
     ports:
       - "5432:5432"
     volumes:
@@ -19,9 +19,7 @@ services:
       - airbnb-network
 
   app:
-    build:
-      context: .
-      dockerfile: Dockerfile
+    image: ${ECR_REGISTRY}/airbnb-app:latest
     container_name: airbnb_app
     restart: unless-stopped
     ports:
@@ -29,7 +27,9 @@ services:
     env_file:
       - .env
     environment:
-      <<: *db-url
+       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgis:5432/${POSTGRES_DB}
+    ports:
+      - "127.0.0.1:3000:3000"
     networks:
       - airbnb-network
 
