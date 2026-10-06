@@ -24,6 +24,8 @@ RUN --mount=type=cache,id=pnpm,target=/pnpm/store \
     pnpm install --frozen-lockfile
 
 
+    
+
 # -------------------------
 # Build
 # -------------------------
@@ -37,6 +39,9 @@ ENV DATABASE_URL="postgresql://user:pass@localhost:5432/db"
 RUN pnpm exec prisma generate
 
 RUN pnpm build
+
+FROM builder AS migrator
+CMD ["pnpm", "exec", "prisma", "migrate", "deploy", "--config", "prisma7.config.ts"]
 
 
 # -------------------------
