@@ -1,5 +1,5 @@
 import { uiShell } from "@/lib/ui-classes";
-import { Section, type LucideIcon } from "lucide-react";
+import { type LucideIcon } from "lucide-react";
 import type { ReactNode } from "react";
 
 interface PageIntro {
