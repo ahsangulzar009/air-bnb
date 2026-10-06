@@ -41,7 +41,7 @@ RUN pnpm build
 # -------------------------
 # Production
 # -------------------------
-FROM node:22-alpine AS runner
+FROM node:24-alpine AS runner
 
 RUN apk add --no-cache libc6-compat
 
