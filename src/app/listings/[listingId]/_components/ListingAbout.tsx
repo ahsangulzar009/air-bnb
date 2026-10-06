@@ -1,5 +1,5 @@
 import { Bath, BedDouble, Users } from 'lucide-react';
-import React from 'react'
+
 
 interface ListingAboutProps {
   description: string;
