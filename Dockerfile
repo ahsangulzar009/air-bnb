@@ -36,16 +36,14 @@ COPY --from=builder --chown=node:node /app/public ./public
 COPY --from=builder --chown=node:node /app/.next/standalone ./
 COPY --from=builder --chown=node:node /app/.next/static ./.next/static
 
-# Prisma — schema + migrations + generated client
-# (generated/prisma bhi prisma/ ke andar hai, automatically aayega)
+# ⬇️ YE STEP ZAROORI — standalone ka node_modules hatao
+RUN rm -rf ./node_modules
+
+# Ab fresh full node_modules copy karo (koi symlink conflict nahi)
+COPY --from=builder --chown=node:node /app/node_modules ./node_modules
+
+# Prisma source files
 COPY --from=builder --chown=node:node /app/prisma ./prisma
-
-# Prisma CLI + runtime + dotenv
-COPY --from=builder --chown=node:node /app/node_modules/prisma ./node_modules/prisma
-COPY --from=builder --chown=node:node /app/node_modules/@prisma ./node_modules/@prisma
-COPY --from=builder --chown=node:node /app/node_modules/dotenv ./node_modules/dotenv
-
-# Prisma config
 COPY --from=builder --chown=node:node /app/prisma7.config.ts ./prisma7.config.ts
 
 USER node
