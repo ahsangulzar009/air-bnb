@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --webpack",
-    "build": "next build --webpack",
+    "dev": "next dev",
+    "build": "next build",
     "start": "next start",
     "prisma:generate": "npx prisma generate --schema=./prisma/schema.prisma",
     "prisma:migrate": "npx prisma migrate dev --name init --schema=./prisma/schema.prisma",

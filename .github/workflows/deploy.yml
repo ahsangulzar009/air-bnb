@@ -51,17 +51,8 @@ jobs:
             set -e
             cd ~/airbnb
 
-            set -a; source .env; set +a
-
             aws ecr get-login-password --region "$AWS_REGION" | \
               docker login --username AWS --password-stdin "$ECR_REGISTRY"
-
-            docker compose up -d postgis
-
-            until docker compose exec -T postgis \
-                  pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB" >/dev/null 2>&1; do
-              echo "waiting for postgres..."; sleep 2
-            done
 
             docker compose pull app
             docker compose up -d --force-recreate app
