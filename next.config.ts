@@ -6,6 +6,7 @@ const nextConfig: NextConfig = {
     '/**': [
       './prisma/**/*',
       './prisma7.config.ts',
+      './node_modules/.pnpm/**/*',
       './node_modules/.prisma/**/*',
       './node_modules/@prisma/**/*',
       './node_modules/prisma/**/*', 
