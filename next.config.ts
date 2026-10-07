@@ -2,6 +2,15 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   output: 'standalone',
+  outputFileTracingIncludes: {
+    '/**': [
+      './prisma/**/*',
+      './prisma7.config.ts',
+      './node_modules/.prisma/**/*',
+      './node_modules/@prisma/**/*',
+      './node_modules/prisma/**/*', 
+    ],
+  },
   images:{
     remotePatterns:[
       {protocol:'https', hostname:'images.unsplash.com'},

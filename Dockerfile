@@ -61,7 +61,7 @@ WORKDIR /app
 
 FROM base AS deps
 COPY package.json pnpm-lock.yaml ./
-RUN --mount=type=cache, id=pnpm, target=/pnpm/cache \
+RUN --mount=type=cache,id=pnpm,target=/pnpm/cache \
     pnpm install --frozen-lockfile
 
 FROM deps AS builder
@@ -75,16 +75,12 @@ FROM node:24-slim AS runner
 
 WORKDIR /app
 RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
-ENV NODE_ENV=production PORT=3000 NEXT_TELEMETRY_DISABLED=1 HOSTNAME=0.0.0.0
+ENV NODE_ENV=production PORT=3000 NEXT_TELEMETRY_DISABLED=1
 
 
 COPY --from=builder --chown=node:node  /app/public ./public
 COPY --from=builder  --chown=node:node /app/.next/standalone ./
 COPY --from=builder  --chown=node:node /app/.next/static ./.next/static
-
-RUN rm -rf ./node_modules
-
-COPY --from=builder --chown=node:node /app/node_modules ./node_modules
 COPY --from=builder --chown=node:node /app/prisma ./prisma
 COPY --from=builder --chown=node:node /app/prisma7.config.ts ./prisma7.config.ts
 
