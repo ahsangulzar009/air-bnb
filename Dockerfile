@@ -75,12 +75,14 @@ FROM node:24-slim AS runner
 
 WORKDIR /app
 RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
-ENV NODE_ENV=production PORT=3000 NEXT_TELEMETRY_DISABLED=1 HOSTNAME=0.0.0.0
+ENV NODE_ENV=production PORT=3000 NEXT_TELEMETRY_DISABLED=1
 
+RUN corepack enable && pnpm add -g prisma
 
 COPY --from=builder --chown=node:node  /app/public ./public
 COPY --from=builder  --chown=node:node /app/.next/standalone ./
 COPY --from=builder  --chown=node:node /app/.next/static ./.next/static
+
 
 COPY --from=builder --chown=node:node /app/prisma ./prisma
 COPY --from=builder --chown=node:node /app/prisma7.config.ts ./prisma7.config.ts
