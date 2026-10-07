@@ -21,27 +21,30 @@ ENV DATABASE_URL="postgresql://user:pass@localhost:5432/db"
 RUN pnpm exec prisma generate --config prisma7.config.ts
 RUN pnpm build
 
-# ---------- migrator ----------
-FROM base AS migrator
-COPY --from=deps /app/node_modules ./node_modules
-COPY prisma ./prisma
-COPY prisma7.config.ts ./prisma7.config.ts
-COPY package.json ./
-CMD ["pnpm", "exec", "prisma", "migrate", "deploy"]
-
 # ---------- runner ----------
 FROM node:24-alpine AS runner
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
+
 ENV NODE_ENV=production \
     NEXT_TELEMETRY_DISABLED=1 \
     PORT=3000 \
     HOSTNAME=0.0.0.0
 
+# Next.js standalone
 COPY --from=builder --chown=node:node /app/public ./public
 COPY --from=builder --chown=node:node /app/.next/standalone ./
 COPY --from=builder --chown=node:node /app/.next/static ./.next/static
 
+# Prisma CLI + schema + migrations + config
+COPY --from=builder --chown=node:node /app/prisma ./prisma
+COPY --from=builder --chown=node:node /app/prisma7.config.ts ./prisma7.config.ts
+COPY --from=builder --chown=node:node /app/node_modules/prisma ./node_modules/prisma
+COPY --from=builder --chown=node:node /app/node_modules/@prisma ./node_modules/@prisma
+COPY --from=builder --chown=node:node /app/node_modules/.prisma ./node_modules/.prisma
+
 USER node
 EXPOSE 3000
-CMD ["node", "server.js"]
+
+# migrate deploy → phir app start
+CMD ["sh", "-c", "node node_modules/prisma/build/index.js migrate deploy --config prisma7.config.ts && node server.js"]
