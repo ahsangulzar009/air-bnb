@@ -1,7 +1,3 @@
-
-x-db-url: &db-url
-  DATABASE_URL: postgresql://air-bnb:airbnb1122@postgis:5432/air-bnb
-
 services:
   postgis:
     image: postgis/postgis:16-3.4
@@ -12,26 +8,22 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
     ports:
-      - "5432:5432"
+      - "127.0.0.1:5432:5432" 
     volumes:
-      - ./airbnbPgdata:/var/lib/postgresql/data
-    networks:
-      - airbnb-network
+      - airbnb_pgdata:/var/lib/postgresql/data
+    networks: [airbnb-network]
 
   app:
     image: ${ECR_REGISTRY}/airbnb-app:latest
     container_name: airbnb_app
     restart: unless-stopped
-    ports:
-      - "3000:3000"
-    env_file:
-      - .env
+    env_file: [.env]
     environment:
-       DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgis:5432/${POSTGRES_DB}
+      DATABASE_URL: postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgis:5432/${POSTGRES_DB}
     ports:
       - "127.0.0.1:3000:3000"
-    networks:
-      - airbnb-network
+    depends_on: [postgis]
+    networks: [airbnb-network]
 
 networks:
   airbnb-network:
