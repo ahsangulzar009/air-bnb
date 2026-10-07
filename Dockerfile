@@ -77,7 +77,7 @@ WORKDIR /app
 RUN apt-get update -y && apt-get install -y openssl && rm -rf /var/lib/apt/lists/*
 ENV NODE_ENV=production PORT=3000 NEXT_TELEMETRY_DISABLED=1
 
-RUN corepack enable && pnpm add -g prisma
+RUN npm install -g prisma
 
 COPY --from=builder --chown=node:node  /app/public ./public
 COPY --from=builder  --chown=node:node /app/.next/standalone ./
