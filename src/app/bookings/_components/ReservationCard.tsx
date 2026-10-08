@@ -19,7 +19,6 @@ interface props {
 }
 
 
-
 const ReservationCard = ({ reservation, today }: props) => {
   const isActive = reservation.endDate >= today
   return (
