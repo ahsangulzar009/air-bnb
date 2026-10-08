@@ -83,7 +83,7 @@ COPY --from=builder  --chown=node:node /app/.next/standalone ./
 COPY --from=builder  --chown=node:node /app/.next/static ./.next/static
 
 COPY --from=builder --chown=node:node /app/prisma ./prisma
-COPY --from=builder --chown=node:node /app/prisma7.config.js ./prisma7.config.js
+COPY --from=builder --chown=node:node /app/prisma7.config.ts ./prisma7.config.ts
 COPY --from=builder --chown=node:node /app/src ./src
 COPY --from=builder --chown=node:node /app/tsconfig.json ./tsconfig.json
 COPY --from=builder --chown=node:node /app/node_modules/prisma ./node_modules/prisma
