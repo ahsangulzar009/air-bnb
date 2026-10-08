@@ -68,7 +68,7 @@ FROM deps AS builder
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 ENV DATABASE_URL="postgresql://user:pass@localhost:5432/db"
-RUN pnpm exec prisma generate --config prisma7.config.js
+RUN pnpm exec prisma generate --config prisma7.config.ts
 RUN pnpm build
 
 FROM node:24-slim AS runner
