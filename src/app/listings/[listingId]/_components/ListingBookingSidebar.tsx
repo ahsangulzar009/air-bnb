@@ -1,7 +1,6 @@
 import { CalendarCheck2 } from "lucide-react";
 import ListingReservationForm from "./ListingReservationForm";
 
-
 interface ListingBookingSidebarProps {
   listingId: string;
   pricePerNight: number;
