@@ -82,20 +82,16 @@ COPY --from=builder --chown=node:node  /app/public ./public
 COPY --from=builder  --chown=node:node /app/.next/standalone ./
 COPY --from=builder  --chown=node:node /app/.next/static ./.next/static
 
+RUN rm -rf ./node_modules
+
+COPY --from=builder --chown=node:node /app/node_modules ./node_modules
 COPY --from=builder --chown=node:node /app/prisma ./prisma
 COPY --from=builder --chown=node:node /app/prisma7.config.ts ./prisma7.config.ts
 COPY --from=builder --chown=node:node /app/src ./src
 COPY --from=builder --chown=node:node /app/tsconfig.json ./tsconfig.json
-COPY --from=builder --chown=node:node /app/node_modules/prisma ./node_modules/prisma
-COPY --from=builder --chown=node:node /app/node_modules/@prisma ./node_modules/@prisma
 
 
 USER node
-CMD ["sh", "-c", "node node_modules/prisma/build/index.js migrate deploy --config prisma7.config.js && node server.js"]
+CMD ["sh", "-c", "node node_modules/prisma/build/index.js migrate deploy --config prisma7.config.ts && node server.js"]
 
 
-
-
-# RUN rm -rf ./node_modules
-
-# COPY --from=builder --chown=node:node /app/node_modules ./node_modules
