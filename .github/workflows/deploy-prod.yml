@@ -59,4 +59,4 @@ jobs:
 
             docker compose pull app
             docker compose up -d --force-recreate app
-            docker image prune -f
+            docker image prune -af
