@@ -8,14 +8,14 @@ const nextConfig: NextConfig = {
       './prisma7.config.ts',
     ],
   },
-  images: {
-    remotePatterns: [
-      { protocol: 'https', hostname: 'images.unsplash.com' },
-      { protocol: "https", hostname: "utfs.io" },
-      { protocol: "https", hostname: "*.ufs.sh" },
-      { protocol: "https", hostname: "i.dummyjson.com" },
-      { protocol: "https", hostname: "cdn.dummyjson.com" },
-      { protocol: "https", hostname: "a0.muscache.com" }
+  images:{
+    remotePatterns:[
+      {protocol:'https', hostname:'images.unsplash.com'},
+      {protocol:"https", hostname:"utfs.io"},
+      {protocol:"https", hostname:"*.ufs.sh"},
+      {protocol:"https", hostname:"i.dummyjson.com"},
+      {protocol:"https", hostname:"cdn.dummyjson.com"},
+      {protocol:"https", hostname:"a0.muscache.com"}
     ]
   }
 };
