@@ -6,6 +6,8 @@ on:
 
 env:
   AWS_REGION: ap-southeast-1
+  ECR_REPO: airbnb-app
+  IMAGE_TAG: v${{ github.run_number }}
 
 jobs:
   deploy:
@@ -33,7 +35,7 @@ jobs:
           context: .
           target: runner
           push: true
-          tags: ${{ steps.login-ecr.outputs.registry }}/airbnb-app:latest
+          tags: ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPO }}:${{ env.IMAGE_TAG }}
           cache-from: type=gha,scope=app
           cache-to: type=gha,mode=max,scope=app
 
@@ -42,11 +44,12 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           AWS_REGION: ${{ env.AWS_REGION }}
+          IMAGE_TAG: ${{ env.IMAGE_TAG }}
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_SSH_KEY }}
-          envs: ECR_REGISTRY,AWS_REGION
+          envs: ECR_REGISTRY,AWS_REGION,IMAGE_TAG
           script: |
             set -e
             cd ~/airbnb
