@@ -15,7 +15,7 @@ export async function Navbar() {
       <nav className="mx-auto flex max-w-7xl items-center justify-between md:px-18 px-4 py-4">
         <Link href='/' className="flex items-center gap-2 text-lg font-bold tracking-tight text-brand-500">
           <House className="size-5"/>
-          <span>Stay Scape (DONE.)</span>
+          <span>Stay Scape (DONE)</span>
         </Link>
 
         <div className="flex items-center gap-2">
